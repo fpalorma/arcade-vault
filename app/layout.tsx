@@ -36,12 +36,14 @@ export default function RootLayout({
       lang="en"
       className={`${pressStart2P.variable} ${courierPrime.variable} ${jetbrainsMono.variable} h-full`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Providers>
           <div className="av-bg" />
           <div className="av-noise" />
-          <Nav />
-          <main className="av-main">{children}</main>
+          <div id="root">
+            <Nav />
+            <main className="av-main">{children}</main>
+          </div>
         </Providers>
       </body>
     </html>
