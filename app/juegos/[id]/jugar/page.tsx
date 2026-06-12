@@ -123,7 +123,7 @@ export default function PlayerPage() {
             )}
             <div className="actions">
               <button className="btn" onClick={restart}>JUGAR DE NUEVO</button>
-              <Link href="/" className="btn magenta">VOLVER AL VAULT</Link>
+              <Link href="/biblioteca" className="btn magenta">VOLVER AL VAULT</Link>
             </div>
           </div>
         </div>

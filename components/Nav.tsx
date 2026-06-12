@@ -11,7 +11,7 @@ export function Nav() {
   const pathname = usePathname()
   const { user, setUser } = useUser()
 
-  const isLib = pathname === '/' || pathname.startsWith('/juegos')
+  const isLib = pathname === '/biblioteca' || pathname.startsWith('/juegos')
   const isSalon = pathname === '/salon'
   const isAuth = pathname === '/auth'
 
@@ -33,7 +33,7 @@ export function Nav() {
         </Link>
 
         <div className="links">
-          <Link href="/" className={isLib ? 'active' : ''}>Biblioteca</Link>
+          <Link href="/biblioteca" className={isLib ? 'active' : ''}>BIBLIOTECA</Link>
           <Link href="/salon" className={isSalon ? 'active' : ''}>Salón de la Fama</Link>
         </div>
 
@@ -67,7 +67,7 @@ export function Nav() {
       />
       <aside className={'av-mobile-panel' + (open ? ' open' : '')}>
         <div className="pixel neon-cyan" style={{ fontSize: 11, marginBottom: 16 }}>MENÚ</div>
-        <Link href="/" className={isLib ? 'active' : ''} onClick={close}>Biblioteca</Link>
+        <Link href="/biblioteca" className={isLib ? 'active' : ''} onClick={close}>BIBLIOTECA</Link>
         <Link href="/salon" className={isSalon ? 'active' : ''} onClick={close}>Salón de la Fama</Link>
         <Link href="/auth" className={isAuth ? 'active' : ''} onClick={close}>
           {user ? 'Cuenta' : 'Iniciar Sesión'}
