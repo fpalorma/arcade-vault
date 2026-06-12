@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { AppUser, getStoredUser } from '@/lib/user'
 
 interface UserContextValue {
@@ -18,7 +18,11 @@ export function useUser() {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AppUser | null>(getStoredUser)
+  const [user, setUser] = useState<AppUser | null>(null)
+
+  useEffect(() => {
+    setUser(getStoredUser())
+  }, [])
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

@@ -1,6 +1,6 @@
 # 01 — MVP Visual de Arcade Vault
 
-**Estado:** Aprobado  
+**Estado:** Implementado  
 **Fecha:** 2026-06-11  
 **Dependencias:** ninguna (spec inicial)  
 
@@ -121,28 +121,28 @@ que lee `localStorage` en el montaje. Se pasa por Context a Nav y pantallas que 
 
 ## Acceptance Criteria
 
-- [ ] `/` muestra el hero, los filtros de categoría y el grid de 8 juegos
-- [ ] El filtro por categoría reduce las tarjetas visibles correctamente
-- [ ] La búsqueda por nombre filtra en tiempo real
-- [ ] Cada tarjeta navega a `/juegos/[id]` al hacer clic
-- [ ] `/juegos/[id]` muestra la portada, stats, leaderboard mock y los dos botones de acción
-- [ ] El botón "JUGAR AHORA" navega a `/juegos/[id]/jugar`
-- [ ] El botón "VOLVER AL VAULT" navega a `/`
-- [ ] `/juegos/[id]/jugar` muestra el HUD con score, vidas y nivel
-- [ ] El score se incrementa automáticamente mientras no está en pausa ni terminado
-- [ ] El botón PAUSA detiene el score; REANUDAR lo retoma
-- [ ] El botón FIN abre el modal de Game Over con el score final
-- [ ] El modal permite escribir iniciales y guardar la puntuación en localStorage
-- [ ] `/auth` muestra los tabs login y registro; el tab registro añade el campo email
-- [ ] Al hacer submit en `/auth` se guarda el usuario en localStorage y redirige a `/`
-- [ ] "JUGAR COMO INVITADO" navega a `/` sin guardar usuario
-- [ ] `/salon` muestra el pódium top 3 y la tabla completa para cada juego
-- [ ] Los tabs del Salón cambian el leaderboard al juego seleccionado
-- [ ] Si hay usuario logueado, aparece su fila destacada al final de la tabla
-- [ ] El Nav muestra el nombre del usuario logueado cuando hay sesión activa
-- [ ] El Nav muestra "Iniciar Sesión" cuando no hay sesión
-- [ ] El menú hamburguesa se despliega y cierra en mobile
-- [ ] Recargar cualquier ruta mantiene la sesión si estaba guardada en localStorage
+- [x] `/` muestra el hero, los filtros de categoría y el grid de 8 juegos
+- [x] El filtro por categoría reduce las tarjetas visibles correctamente
+- [x] La búsqueda por nombre filtra en tiempo real
+- [x] Cada tarjeta navega a `/juegos/[id]` al hacer clic
+- [x] `/juegos/[id]` muestra la portada, stats, leaderboard mock y los dos botones de acción
+- [x] El botón "JUGAR AHORA" navega a `/juegos/[id]/jugar`
+- [x] El botón "VOLVER AL VAULT" navega a `/`
+- [x] `/juegos/[id]/jugar` muestra el HUD con score, vidas y nivel
+- [x] El score se incrementa automáticamente mientras no está en pausa ni terminado
+- [x] El botón PAUSA detiene el score; REANUDAR lo retoma
+- [x] El botón FIN abre el modal de Game Over con el score final
+- [x] El modal permite escribir iniciales y guardar la puntuación en localStorage
+- [x] `/auth` muestra los tabs login y registro; el tab registro añade el campo email
+- [x] Al hacer submit en `/auth` se guarda el usuario en localStorage y redirige a `/`
+- [x] "JUGAR COMO INVITADO" navega a `/` sin guardar usuario
+- [x] `/salon` muestra el pódium top 3 y la tabla completa para cada juego
+- [x] Los tabs del Salón cambian el leaderboard al juego seleccionado
+- [x] Si hay usuario logueado, aparece su fila destacada al final de la tabla
+- [x] El Nav muestra el nombre del usuario logueado cuando hay sesión activa
+- [x] El Nav muestra "Iniciar Sesión" cuando no hay sesión
+- [x] El menú hamburguesa se despliega y cierra en mobile
+- [x] Recargar cualquier ruta mantiene la sesión si estaba guardada en localStorage
 
 ---
 
