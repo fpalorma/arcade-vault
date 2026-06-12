@@ -1,6 +1,6 @@
 # 02 — Home Page de Arcade Vault
 
-**Estado:** Aprobado  
+**Estado:** Implementado  
 **Fecha:** 2026-06-12  
 **Dependencias:** 01-mvp-visual (Biblioteca en `/`, Nav, datos mock en `lib/data.ts`, estilos en `globals.css`)
 
