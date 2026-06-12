@@ -154,8 +154,22 @@ function useReveal() {
   }, [])
 }
 
+function useScrollFadeIndicator() {
+  useEffect(() => {
+    const el = document.querySelector('.hero-scroll') as HTMLElement | null
+    if (!el) return
+    const onScroll = () => {
+      const opacity = Math.max(0, 1 - window.scrollY / 180)
+      el.style.opacity = String(opacity)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+}
+
 export default function HomePage() {
   useReveal()
+  useScrollFadeIndicator()
 
   return (
     <div className="home fade-in">
@@ -178,10 +192,10 @@ export default function HomePage() {
             <Link href="/biblioteca" className="btn xl pulse">▶  EXPLORAR JUEGOS</Link>
             <Link href="/auth" className="btn xl magenta">✦  CREAR CUENTA</Link>
           </div>
-          <div className="hero-scroll" aria-hidden="true">
-            <span>DESLIZA</span>
-            <span className="arrow">▼</span>
-          </div>
+        </div>
+        <div className="hero-scroll" aria-hidden="true">
+          <span>DESLIZA</span>
+          <span className="arrow">▼</span>
         </div>
       </section>
 
