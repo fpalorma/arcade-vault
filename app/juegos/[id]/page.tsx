@@ -44,7 +44,7 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
           </div>
           <div className="detail-actions">
             <Link href={`/juegos/${game.id}/jugar`} className="btn xl pulse">▶ JUGAR AHORA</Link>
-            <Link href="/" className="btn ghost lg">VOLVER AL VAULT</Link>
+            <Link href="/biblioteca" className="btn ghost lg">VOLVER AL VAULT</Link>
           </div>
         </div>
       </div>
