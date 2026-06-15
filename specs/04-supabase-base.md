@@ -1,6 +1,6 @@
 # 04 — Integración Base de Supabase
 
-**Estado:** Aprobado
+**Estado:** Implementado
 **Fecha:** 2026-06-15
 **Dependencias:** 03-about-contact (proyecto Next.js 16 funcional con App Router)
 
