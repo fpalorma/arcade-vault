@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tetris</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrapper">
+    <div class="game-container">
+      <canvas id="board" width="300" height="600"></canvas>
+
+      <aside class="panel">
+        <button id="theme-btn" class="theme-btn">&#9788; Modo claro</button>
+        <select id="skin-select" class="skin-select">
+          <option value="retro">Retro</option>
+          <option value="neon">Neon</option>
+          <option value="pastel">Pastel</option>
+          <option value="pixel">Pixel Art</option>
+        </select>
+
+        <div class="panel-section">
+          <span class="label">SCORE</span>
+          <span class="value" id="score">0</span>
+        </div>
+        <div class="panel-section">
+          <span class="label">LINES</span>
+          <span class="value" id="lines">0</span>
+        </div>
+        <div class="panel-section">
+          <span class="label">LEVEL</span>
+          <span class="value" id="level">1</span>
+        </div>
+
+        <div class="panel-section">
+          <span class="label">NEXT</span>
+          <canvas id="next-canvas" width="120" height="120"></canvas>
+        </div>
+
+        <div class="panel-section powerups-legend">
+          <span class="label">POWERUPS</span>
+          <ul>
+            <li><span class="pw-dot" style="background:#e53935"></span>💣 Bomba 3×3</li>
+            <li><span class="pw-dot" style="background:#fdd835"></span>⚡ Rayo cruz</li>
+            <li><span class="pw-dot" style="background:#42a5f5"></span>🌍 Gravedad</li>
+          </ul>
+        </div>
+
+        <div class="panel-section controls">
+          <span class="label">CONTROLS</span>
+          <ul>
+            <li><kbd>←</kbd><kbd>→</kbd> mover</li>
+            <li><kbd>↑</kbd> rotar</li>
+            <li><kbd>↓</kbd> bajar</li>
+            <li><kbd>Space</kbd> caída</li>
+            <li><kbd>P</kbd>/<kbd>Esc</kbd> pausa</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <div id="overlay" class="overlay hidden">
+      <div class="overlay-box">
+        <p id="overlay-title">GAME OVER</p>
+        <p id="overlay-score"></p>
+        <div id="save-section" class="hidden">
+          <p class="lb-new-label">¡Nuevo récord top 5!</p>
+          <div class="save-row">
+            <input id="name-input" type="text" maxlength="12" placeholder="Tu nombre" />
+            <button id="save-score-btn">Guardar</button>
+          </div>
+        </div>
+        <div id="leaderboard-section" class="hidden">
+          <table class="leaderboard">
+            <thead>
+              <tr><th>#</th><th>Nombre</th><th>Pts</th><th>Combo</th><th>Líneas</th></tr>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+          </table>
+          <button id="reset-records-btn" class="reset-btn">Resetear records</button>
+        </div>
+        <button id="restart-btn">Reiniciar</button>
+      </div>
+    </div>
+
+    <div id="pause-overlay" class="overlay hidden">
+      <div class="overlay-box pause-box">
+        <div id="pause-main">
+          <p class="pause-title">PAUSA</p>
+          <div class="pause-buttons">
+            <button id="pause-resume-btn">Reanudar</button>
+            <button id="pause-restart-btn">Reiniciar</button>
+            <button id="pause-controls-btn">Ver controles</button>
+          </div>
+          <div class="pause-level-row">
+            <label for="start-level-select">Nivel inicial:</label>
+            <select id="start-level-select">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+            </select>
+          </div>
+        </div>
+        <div id="pause-controls-view" class="hidden">
+          <p class="pause-title">CONTROLES</p>
+          <ul class="pause-controls-list">
+            <li><kbd>←</kbd> <kbd>→</kbd> Mover</li>
+            <li><kbd>↑</kbd> / <kbd>X</kbd> Rotar</li>
+            <li><kbd>↓</kbd> Bajar (soft drop)</li>
+            <li><kbd>Space</kbd> Caída instantánea</li>
+            <li><kbd>P</kbd> / <kbd>Esc</kbd> Pausa</li>
+          </ul>
+          <button id="pause-back-btn">Volver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
