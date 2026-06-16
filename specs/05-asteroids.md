@@ -1,6 +1,6 @@
 # 05 — Juego Asteroids
 
-**Estado:** Aprobado
+**Estado:** Implementado
 **Fecha:** 2026-06-16
 **Dependencias:** `04-supabase-base` (plataforma Next.js 16 funcional con Supabase configurado)
 
@@ -99,19 +99,19 @@ interface AsteroidsCanvasProps {
 
 ## Acceptance Criteria
 
-- [ ] `lib/data.ts` contiene una entrada con `id: 'asteroids'` y `title: 'ASTEROIDS'`
-- [ ] El mini-rail de la home muestra 7 juegos e incluye ASTEROIDS
-- [ ] Existe `components/games/AsteroidsCanvas.tsx` con las props `paused`, `onScore`, `onLives`, `onLevel`, `onGameOver`
-- [ ] Existe `app/juegos/asteroids/jugar/page.tsx` como Client Component con layout `av-player`
-- [ ] `/juegos/asteroids` carga sin errores y el botón "JUGAR AHORA" lleva a `/juegos/asteroids/jugar`
-- [ ] El canvas arranca el juego automáticamente al montar el componente
-- [ ] El HUD React muestra el score, vidas y nivel reales del juego en tiempo real
-- [ ] El botón PAUSA detiene el game loop; REANUDAR lo continúa
-- [ ] Al perder todas las vidas aparece el modal de la plataforma, no un overlay en canvas
-- [ ] El botón "JUGAR DE NUEVO" reinicia el canvas y resetea el estado React
+- [x] `lib/data.ts` contiene una entrada con `id: 'asteroids'` y `title: 'ASTEROIDS'`
+- [x] El mini-rail de la home muestra 7 juegos e incluye ASTEROIDS
+- [x] Existe `components/games/AsteroidsCanvas.tsx` con las props `paused`, `onScore`, `onLives`, `onLevel`, `onGameOver`
+- [x] Existe `app/juegos/asteroids/jugar/page.tsx` como Client Component con layout `av-player`
+- [x] `/juegos/asteroids` carga sin errores y el botón "JUGAR AHORA" lleva a `/juegos/asteroids/jugar`
+- [x] El canvas arranca el juego automáticamente al montar el componente
+- [x] El HUD React muestra el score, vidas y nivel reales del juego en tiempo real
+- [x] El botón PAUSA detiene el game loop; REANUDAR lo continúa
+- [x] Al perder todas las vidas aparece el modal de la plataforma, no un overlay en canvas
+- [x] El botón "JUGAR DE NUEVO" reinicia el canvas y resetea el estado React
 - [ ] Al salir de la página no quedan `requestAnimationFrame` activos
-- [ ] El canvas no dibuja HUD propio ni overlay de game over
-- [ ] `app/juegos/[id]/jugar/page.tsx` y el juego 'rocas' no han sido modificados
+- [x] El canvas no dibuja HUD propio ni overlay de game over
+- [x] `app/juegos/[id]/jugar/page.tsx` y el juego 'rocas' no han sido modificados
 
 ---
 
