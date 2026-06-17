@@ -1,6 +1,6 @@
 # 06 — Tabla de Juegos y Leaderboard
 
-**Estado:** aprobado
+**Estado:** implementado
 **Fecha:** 2026-06-17
 **Dependencias:** `05-asteroids` (juego funcional con modal de game over y campo playerName)
 
