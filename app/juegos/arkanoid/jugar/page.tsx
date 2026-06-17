@@ -5,24 +5,24 @@ import { useRef, useState } from 'react'
 import { useUser } from '@/app/providers'
 import { storeUser } from '@/lib/user'
 import { createClient } from '@/lib/supabase/client'
-import TetrisCanvas, { type TetrisHandle } from '@/components/games/TetrisCanvas'
+import ArkanoidCanvas, { type ArkanoidHandle } from '@/components/games/ArkanoidCanvas'
 
-export default function TetrisPlayerPage() {
+export default function ArkanoidPlayerPage() {
   const { user } = useUser()
 
   const [score,      setScore]      = useState(0)
-  const [lines,      setLines]      = useState(0)
+  const [lives,      setLives]      = useState(3)
   const [level,      setLevel]      = useState(1)
   const [paused,     setPaused]     = useState(false)
   const [over,       setOver]       = useState(false)
   const [playerName, setPlayerName] = useState(user?.name ?? 'INVITADO')
   const [saved,      setSaved]      = useState(false)
 
-  const canvasRef = useRef<TetrisHandle>(null)
+  const canvasRef = useRef<ArkanoidHandle>(null)
 
   function restart() {
     setScore(0)
-    setLines(0)
+    setLives(3)
     setLevel(1)
     setPaused(false)
     setOver(false)
@@ -36,7 +36,7 @@ export default function TetrisPlayerPage() {
     storeUser({ name: playerName })
     const supabase = createClient()
     await supabase.from('scores').insert({
-      game_id: 'tetris',
+      game_id: 'arkanoid',
       player_name: playerName.trim(),
       score,
       level,
@@ -56,9 +56,9 @@ export default function TetrisPlayerPage() {
             <div className="l">Puntuación</div>
             <div className="v">{score.toLocaleString('es-ES')}</div>
           </div>
-          <div className="hud-stat">
-            <div className="l">Líneas</div>
-            <div className="v">{lines}</div>
+          <div className="hud-stat lives">
+            <div className="l">Vidas</div>
+            <div className="v">{'♥ '.repeat(Math.max(0, lives)).trim() || '—'}</div>
           </div>
           <div className="hud-stat level">
             <div className="l">Nivel</div>
@@ -69,17 +69,17 @@ export default function TetrisPlayerPage() {
           <button className="btn yellow" onClick={() => setPaused(p => !p)}>
             {paused ? 'REANUDAR' : 'PAUSA'}
           </button>
-          <Link href="/juegos/tetris" className="btn ghost">SALIR</Link>
+          <Link href="/juegos/arkanoid" className="btn ghost">SALIR</Link>
         </div>
       </div>
 
-      <div className="crt" style={{ maxWidth: 'min(468px, calc((100dvh - 282px) * 7 / 10 + 48px))', margin: '0 auto' }}>
-        <div className="crt-screen" style={{ aspectRatio: '7 / 10' }}>
-          <TetrisCanvas
+      <div className="crt" style={{ maxWidth: 'min(528px, calc((100dvh - 282px) * 3 / 4 + 48px))', margin: '0 auto' }}>
+        <div className="crt-screen" style={{ aspectRatio: '3 / 4' }}>
+          <ArkanoidCanvas
             ref={canvasRef}
             paused={paused}
             onScore={setScore}
-            onLives={setLines}
+            onLives={setLives}
             onLevel={setLevel}
             onGameOver={() => setOver(true)}
           />
@@ -96,7 +96,7 @@ export default function TetrisPlayerPage() {
         </div>
         <div className="crt-bottom">
           <span className="led">SEÑAL OK</span>
-          <span>TETRIS · CRT-83 · 60 HZ</span>
+          <span>ARKANOID · CRT-83 · 60 HZ</span>
           <span>CARGA · 1MB</span>
         </div>
       </div>
