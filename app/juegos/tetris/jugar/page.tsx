@@ -74,7 +74,7 @@ export default function TetrisPlayerPage() {
       </div>
 
       <div className="crt">
-        <div className="crt-screen">
+        <div className="crt-screen" style={{ aspectRatio: '7 / 10' }}>
           <TetrisCanvas
             ref={canvasRef}
             paused={paused}

@@ -74,7 +74,7 @@ export default function ArkanoidPlayerPage() {
       </div>
 
       <div className="crt">
-        <div className="crt-screen">
+        <div className="crt-screen" style={{ aspectRatio: '3 / 4' }}>
           <ArkanoidCanvas
             ref={canvasRef}
             paused={paused}
