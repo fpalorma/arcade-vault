@@ -1,6 +1,6 @@
 # 08 — Arkanoid y su integración en la plataforma
 
-**Estado:** Aprobado
+**Estado:** Implementado
 **Fecha:** 2026-06-17
 **Dependencias:** `04-supabase-base`, `05-asteroids` (patrón AsteroidsCanvas establecido),
 `06-leaderboard-games-table` (tablas `games` y `scores` operativas en Supabase)
