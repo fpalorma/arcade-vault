@@ -527,19 +527,25 @@ a { color: inherit; text-decoration: none; }
   filter: drop-shadow(0 0 6px rgba(0,245,255,0.4));
 }
 
-.cover-arkanoid { background: linear-gradient(180deg, #07071a 0%, #000d1a 100%); }
+.cover-arkanoid { background: #060615; }
+.cover-arkanoid::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(#ff2255,#ff2255)  0%  10%/100%  9% no-repeat,
+    linear-gradient(#00f5ff,#00f5ff)  8%  21%/ 84%  9% no-repeat,
+    linear-gradient(#00ff88,#00ff88) 16%  32%/ 68%  9% no-repeat,
+    linear-gradient(#ff00ff,#ff00ff) 24%  43%/ 52%  9% no-repeat,
+    linear-gradient(#f5ff00,#f5ff00) 32%  54%/ 36%  9% no-repeat;
+  filter: drop-shadow(0 2px 8px rgba(0,245,255,0.25));
+}
 .cover-arkanoid::after {
   content: "";
   position: absolute; inset: 0;
   background:
-    radial-gradient(circle at 68% 60%, #fff 0 3px, rgba(255,255,255,0.25) 3px 7px, transparent 8px),
-    linear-gradient(#00f5ff,#00f5ff) 18% 82%/64% 5% no-repeat,
-    linear-gradient(#f5ff00,#f5ff00) 27% 57%/46% 6% no-repeat,
-    linear-gradient(#ff00ff,#ff00ff) 21% 50%/58% 6% no-repeat,
-    linear-gradient(#00ff88,#00ff88) 15% 43%/70% 6% no-repeat,
-    linear-gradient(#00f5ff,#00f5ff) 10% 36%/80% 6% no-repeat,
-    linear-gradient(#ff3366,#ff3366)  5% 29%/90% 6% no-repeat;
-  filter: drop-shadow(0 0 10px rgba(0,245,255,0.4));
+    radial-gradient(circle at 62% 73%, #fff 0 5px, rgba(255,255,255,0.2) 5px 12px, transparent 13px),
+    linear-gradient(#00f5ff,#00f5ff) 14% 84%/72% 7% no-repeat;
+  filter: drop-shadow(0 0 14px rgba(0,245,255,0.7));
 }
 
 .cover-tetris { background: radial-gradient(circle at 50% 110%, #001a2a, #0a0a18); }

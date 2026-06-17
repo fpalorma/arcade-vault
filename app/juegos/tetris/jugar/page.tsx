@@ -73,7 +73,7 @@ export default function TetrisPlayerPage() {
         </div>
       </div>
 
-      <div className="crt">
+      <div className="crt" style={{ maxWidth: 'min(468px, calc((100dvh - 282px) * 7 / 10 + 48px))', margin: '0 auto' }}>
         <div className="crt-screen" style={{ aspectRatio: '7 / 10' }}>
           <TetrisCanvas
             ref={canvasRef}

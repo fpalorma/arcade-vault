@@ -73,7 +73,7 @@ export default function ArkanoidPlayerPage() {
         </div>
       </div>
 
-      <div className="crt">
+      <div className="crt" style={{ maxWidth: 'min(528px, calc((100dvh - 282px) * 3 / 4 + 48px))', margin: '0 auto' }}>
         <div className="crt-screen" style={{ aspectRatio: '3 / 4' }}>
           <ArkanoidCanvas
             ref={canvasRef}
