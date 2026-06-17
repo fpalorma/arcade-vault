@@ -13,6 +13,7 @@ export function Nav() {
 
   const isLib = pathname === '/biblioteca' || pathname.startsWith('/juegos')
   const isSalon = pathname === '/salon'
+  const isLeaderboard = pathname === '/leaderboard'
   const isAbout = pathname === '/about'
   const isAuth = pathname === '/auth'
 
@@ -35,6 +36,7 @@ export function Nav() {
 
         <div className="links">
           <Link href="/biblioteca" className={isLib ? 'active' : ''}>BIBLIOTECA</Link>
+          <Link href="/leaderboard" className={isLeaderboard ? 'active' : ''}>LEADERBOARD</Link>
           <Link href="/salon" className={isSalon ? 'active' : ''}>Salón de la Fama</Link>
           <Link href="/about" className={isAbout ? 'active' : ''}>ACERCA DE</Link>
         </div>
@@ -70,6 +72,7 @@ export function Nav() {
       <aside className={'av-mobile-panel' + (open ? ' open' : '')}>
         <div className="pixel neon-cyan" style={{ fontSize: 11, marginBottom: 16 }}>MENÚ</div>
         <Link href="/biblioteca" className={isLib ? 'active' : ''} onClick={close}>BIBLIOTECA</Link>
+        <Link href="/leaderboard" className={isLeaderboard ? 'active' : ''} onClick={close}>LEADERBOARD</Link>
         <Link href="/salon" className={isSalon ? 'active' : ''} onClick={close}>Salón de la Fama</Link>
         <Link href="/about" className={isAbout ? 'active' : ''} onClick={close}>ACERCA DE</Link>
         <Link href="/auth" className={isAuth ? 'active' : ''} onClick={close}>

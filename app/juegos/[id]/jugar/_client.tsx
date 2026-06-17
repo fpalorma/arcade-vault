@@ -1,42 +1,46 @@
 'use client'
 
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import type { Game } from '@/lib/supabase/queries'
 import { useUser } from '@/app/providers'
 import { storeUser } from '@/lib/user'
 import { createClient } from '@/lib/supabase/client'
-import AsteroidsCanvas, { type AsteroidsHandle } from '@/components/games/AsteroidsCanvas'
 
-export default function AsteroidsPlayerPage() {
+export default function JugarClient({ game }: { game: Game }) {
   const { user } = useUser()
 
-  const [score,      setScore]      = useState(0)
-  const [lives,      setLives]      = useState(3)
-  const [level,      setLevel]      = useState(1)
-  const [paused,     setPaused]     = useState(false)
-  const [over,       setOver]       = useState(false)
+  const [score, setScore] = useState(0)
+  const [lives] = useState(3)
+  const [paused, setPaused] = useState(false)
+  const [over, setOver] = useState(false)
   const [playerName, setPlayerName] = useState(user?.name ?? 'INVITADO')
-  const [saved,      setSaved]      = useState(false)
+  const [saved, setSaved] = useState(false)
 
-  const canvasRef = useRef<AsteroidsHandle>(null)
+  const level = Math.floor(score / 2500) + 1
+
+  useEffect(() => {
+    if (over || paused) return
+    const t = setInterval(() => setScore(s => s + Math.floor(10 + Math.random() * 90)), 220)
+    return () => clearInterval(t)
+  }, [over, paused])
+
+  function endGame() { setOver(true) }
 
   function restart() {
     setScore(0)
-    setLives(3)
-    setLevel(1)
     setPaused(false)
     setOver(false)
     setSaved(false)
     setPlayerName(user?.name ?? 'INVITADO')
-    canvasRef.current?.restart()
   }
 
-  async function saveScore() {
+  async function handleSaveScore() {
     if (!playerName.trim()) return
     storeUser({ name: playerName })
     const supabase = createClient()
     await supabase.from('scores').insert({
-      game_id: 'asteroids',
+      game_id: game.id,
       player_name: playerName.trim(),
       score,
       level,
@@ -58,7 +62,7 @@ export default function AsteroidsPlayerPage() {
           </div>
           <div className="hud-stat lives">
             <div className="l">Vidas</div>
-            <div className="v">{'♥ '.repeat(Math.max(0, lives)).trim() || '—'}</div>
+            <div className="v">{'♥ '.repeat(lives).trim() || '—'}</div>
           </div>
           <div className="hud-stat level">
             <div className="l">Nivel</div>
@@ -69,20 +73,20 @@ export default function AsteroidsPlayerPage() {
           <button className="btn yellow" onClick={() => setPaused(p => !p)}>
             {paused ? 'REANUDAR' : 'PAUSA'}
           </button>
-          <Link href="/juegos/asteroids" className="btn ghost">SALIR</Link>
+          <button className="btn magenta" onClick={endGame}>FIN</button>
+          <Link href={`/juegos/${game.id}`} className="btn ghost">SALIR</Link>
         </div>
       </div>
 
       <div className="crt">
         <div className="crt-screen">
-          <AsteroidsCanvas
-            ref={canvasRef}
-            paused={paused}
-            onScore={setScore}
-            onLives={setLives}
-            onLevel={setLevel}
-            onGameOver={() => setOver(true)}
-          />
+          <div className="game-arena">
+            <div className="grid-floor" />
+            <div className="enemy e1" />
+            <div className="enemy e2" />
+            <div className="enemy e3" />
+            <div className="player-ship" />
+          </div>
           {paused && (
             <div className="crt-content" style={{ background: 'rgba(0,0,0,0.6)', zIndex: 5 }}>
               <div>
@@ -96,7 +100,7 @@ export default function AsteroidsPlayerPage() {
         </div>
         <div className="crt-bottom">
           <span className="led">SEÑAL OK</span>
-          <span>ASTEROIDS · CRT-83 · 60 HZ</span>
+          <span>{game.title} · CRT-83 · 60 HZ</span>
           <span>CARGA · 1MB</span>
         </div>
       </div>
@@ -108,14 +112,16 @@ export default function AsteroidsPlayerPage() {
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{score.toLocaleString('es-ES')}</div>
             {!saved ? (
-              <div className="input-row">
-                <input
-                  value={playerName}
-                  onChange={e => setPlayerName(e.target.value.toUpperCase().slice(0, 10))}
-                  placeholder="TUS INICIALES"
-                />
-                <button className="btn yellow" onClick={saveScore}>GUARDAR PUNTUACIÓN</button>
-              </div>
+              <>
+                <div className="input-row">
+                  <input
+                    value={playerName}
+                    onChange={e => setPlayerName(e.target.value.toUpperCase().slice(0, 10))}
+                    placeholder="TUS INICIALES"
+                  />
+                  <button className="btn yellow" onClick={handleSaveScore}>GUARDAR PUNTUACIÓN</button>
+                </div>
+              </>
             ) : (
               <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
             )}

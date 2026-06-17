@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { GAMES, seededScores } from '@/lib/data'
+import { getGame, getTopScoresByGame } from '@/lib/supabase/queries'
 
 export default async function DetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const game = GAMES.find(g => g.id === id)
+  const game = await getGame(id)
   if (!game) notFound()
 
-  const scores = seededScores(id.length * 17 + 3, 10)
+  const scores = await getTopScoresByGame(id, 10)
 
   return (
     <div className="av-detail fade-in">
@@ -51,20 +51,43 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
 
       <aside>
         <div className="leaderboard">
-          <h3>MEJORES PUNTUACIONES</h3>
-          {scores.map((r, i) => (
-            <div
-              key={r.name}
-              className={'lb-row' + (i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '')}
-            >
-              <div className="rk">#{String(r.rank).padStart(2, '0')}</div>
-              <div className="pl">
-                {r.name}
-                <div style={{ fontSize: 10, color: 'var(--ink-faint)', letterSpacing: '0.1em' }}>{r.date}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <h3 style={{ margin: 0 }}>MEJORES PUNTUACIONES</h3>
+            <span style={{ fontSize: 9, color: 'var(--cyan)', letterSpacing: '0.15em', border: '1px solid var(--cyan)', padding: '2px 6px', opacity: 0.7 }}>
+              TOP 10
+            </span>
+          </div>
+          {scores.length === 0 ? (
+            <div style={{ padding: '32px 0', textAlign: 'center' }}>
+              <div style={{ fontSize: 11, color: 'var(--magenta)', letterSpacing: '0.15em', marginBottom: 8 }}>
+                ▸ SIN PUNTUACIONES AÚN
               </div>
-              <div className="sc">{r.score.toLocaleString('es-ES')}</div>
+              <div style={{ fontSize: 10, color: 'var(--ink-faint)', letterSpacing: '0.1em' }}>
+                SÉ EL PRIMERO EN RECLAMAR EL #01_
+              </div>
             </div>
-          ))}
+          ) : (
+            scores.map((r, i) => (
+              <div
+                key={r.id}
+                className={'lb-row' + (i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '')}
+              >
+                <div className="rk">#{String(i + 1).padStart(2, '0')}</div>
+                <div className="pl">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {r.player_name}
+                    <span style={{ fontSize: 9, letterSpacing: '0.1em', color: 'var(--cyan)', border: '1px solid var(--cyan)', padding: '1px 4px', opacity: 0.8, flexShrink: 0 }}>
+                      LV.{String(r.level).padStart(2, '0')}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--ink-faint)', letterSpacing: '0.1em' }}>
+                    {new Date(r.created_at).toLocaleDateString('es-ES')}
+                  </div>
+                </div>
+                <div className="sc">{r.score.toLocaleString('es-ES')}</div>
+              </div>
+            ))
+          )}
         </div>
       </aside>
     </div>
