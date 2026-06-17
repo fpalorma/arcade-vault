@@ -507,7 +507,7 @@ const TetrisCanvas = forwardRef<TetrisHandle, Props>(function TetrisCanvas(
       ref={canvasRef}
       width={W}
       height={H}
-      style={{ display: 'block', position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+      style={{ display: 'block', position: 'absolute', top: 0, bottom: 0, left: '50%', transform: 'translateX(-50%)', height: '100%', width: 'auto' }}
     />
   )
 })
