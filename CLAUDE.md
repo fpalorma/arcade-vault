@@ -10,7 +10,12 @@ Arcade Vault is an online gaming platform where users play and compete for high 
 
 ## Skills
 
-Usa siempre /frontend-design para diseñar la interfaz de usuario.
+- `/frontend-design` — Usar **siempre** para diseñar o rediseñar UI.
+- `/spec` — Generar una especificación para una nueva feature antes de implementarla.
+- `/spec-impl` — Implementar una spec existente en `specs/`.
+- `/verify` — Verificar que un cambio funciona ejecutando la app en el navegador.
+- `/code-review` — Revisar el diff actual en busca de bugs y mejoras.
+- `/run` — Arrancar la app y observar el comportamiento en el navegador.
 
 ## Architecture
 
@@ -19,6 +24,183 @@ Usa siempre /frontend-design para diseñar la interfaz de usuario.
 - **Styling**: Tailwind CSS v4 via `@import "tailwindcss"` in `globals.css` (no `tailwind.config.js` — uses `@theme` blocks in CSS)
 - **Bundler**: Turbopack (default for both `dev` and `build`; use `--webpack` flag to opt out)
 - **Fonts**: Geist Sans / Geist Mono via `next/font/google`
+- **Backend**: Supabase (auth + DB + realtime)
+- **Email**: Resend (contact form)
+
+## Environment Variables
+
+```env
+RESEND_API_KEY=                        # Resend API key
+CONTACT_EMAIL=                         # Receives contact form submissions
+NEXT_PUBLIC_SUPABASE_URL=              # Supabase project URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=  # Supabase anon/publishable key
+```
+
+## Supabase
+
+### Tables
+
+**`games`** — catálogo de juegos registrados en la plataforma
+| col | type | notes |
+|-----|------|-------|
+| id | text PK | slug del juego (`'asteroids'`, `'snake'`, …) |
+| title | text | nombre en mayúsculas (`'ASTEROIDS'`) |
+| short | text | descripción breve (home/card) |
+| long | text | descripción larga (página de detalle) |
+| cat | text | categoría (`'ARCADE'`) |
+| cover | text | clase CSS del cover art |
+| color | text | color accent (`'cyan'`, `'green'`, …) |
+| best | int | puntuación máxima histórica |
+| plays | text | número de partidas (formato visual) |
+
+**`scores`** — historial de puntuaciones de todos los juegos
+| col | type | notes |
+|-----|------|-------|
+| id | uuid PK | auto-generated |
+| game_id | text FK → games.id | |
+| player_name | text | máx 10 chars, uppercase |
+| score | int | |
+| level | int | |
+| created_at | timestamptz | |
+
+### Supabase helpers (`lib/supabase/`)
+
+- `server.ts` — `createClient()` para Server Components / Server Actions (requiere `await`)
+- `client.ts` — `createClient()` para Client Components (browser)
+- `queries.ts` — funciones de alto nivel: `getGames`, `getGame`, `getTopScores`, `getTopScoresByGame`, `saveScore` (solo en contexto RSC — usa el server client)
+
+En Client Components usar directamente `createClient()` de `lib/supabase/client.ts` e insertar con `.from('scores').insert(...)`.
+
+### Auth
+
+- `app/providers.tsx` expone `useUser()` → `{ user: { name: string } | null }`
+- `lib/user.ts` — `storeUser({ name })` persiste el nombre en localStorage
+- `app/auth/page.tsx` — página de login/registro
+
+## File Structure
+
+```
+app/
+  layout.tsx          — root layout, providers
+  page.tsx            — home (Server Component)
+  _home-client.tsx    — mini-rail de juegos (Client Component)
+  providers.tsx       — UserProvider (auth context)
+  globals.css         — Tailwind + theme tokens + utility classes
+  about/              — página "Sobre nosotros" + formulario de contacto (Server Action)
+  auth/               — login / registro
+  biblioteca/         — catálogo completo de juegos
+  leaderboard/        — tabla global de puntuaciones
+  salon/              — salón de la fama
+  juegos/
+    [id]/             — página de detalle de juego (RSC)
+      jugar/          — fallback genérico (redirige o placeholder)
+    asteroids/jugar/  — página de juego Asteroids (Client Component)
+    arkanoid/jugar/   — página de juego Arkanoid (Client Component)
+    tetris/jugar/     — página de juego Tetris (Client Component)
+    snake/jugar/      — página de juego Snake (Client Component)
+
+components/
+  Nav.tsx             — barra de navegación global
+  games/
+    AsteroidsCanvas.tsx
+    ArkanoidCanvas.tsx
+    TetrisCanvas.tsx
+    SnakeCanvas.tsx
+
+lib/
+  user.ts             — storeUser / getUser (localStorage)
+  supabase/
+    server.ts
+    client.ts
+    queries.ts
+
+specs/                — especificaciones de features (Spec Driven Design)
+references/           — assets fuente (sprites, referencias visuales)
+public/games/         — assets de juegos servidos en producción
+proxy.ts              — equivalente de middleware (Next.js 16)
+```
+
+## Game Canvas Pattern
+
+Cada juego sigue el mismo contrato de componente:
+
+```tsx
+// components/games/XxxCanvas.tsx
+'use client'
+export interface XxxHandle { restart: () => void }
+interface Props {
+  paused:      boolean
+  onScore:     (score: number) => void
+  onLives:     (lives: number) => void
+  onLevel:     (level: number) => void
+  onGameOver:  () => void
+}
+const XxxCanvas = forwardRef<XxxHandle, Props>(({ paused, onScore, onLives, onLevel, onGameOver }, ref) => {
+  useImperativeHandle(ref, () => ({ restart }))
+  // ...
+})
+export default XxxCanvas
+```
+
+- El canvas **no dibuja HUD propio** ni overlay de game-over — eso lo gestiona la página.
+- Los callbacks (`onScore`, `onLives`, `onLevel`) usan refs internos para evitar re-renders innecesarios.
+- `onGameOver` se dispara una sola vez por partida (ref `gOverFired`).
+
+## Player Page Pattern
+
+Cada `app/juegos/<id>/jugar/page.tsx` es un Client Component con este layout:
+
+```tsx
+'use client'
+// Estado React: score, lives/frutas, level, paused, over, playerName, saved
+// canvasRef: useRef<XxxHandle>(null)
+
+return (
+  <div className="av-player fade-in">
+    <div className="player-hud">
+      {/* stats: Jugador, Puntuación, Vidas/Frutas, Nivel */}
+      <div className="hud-actions">
+        <button className="btn yellow">PAUSA / REANUDAR</button>
+        <Link href="/juegos/<id>" className="btn ghost">SALIR</Link>
+      </div>
+    </div>
+    <div className="crt">
+      <div className="crt-screen">
+        <XxxCanvas ref={canvasRef} paused={paused} onScore={setScore} ... />
+        {/* overlay de pausa opcional */}
+      </div>
+      <div className="crt-bottom">NOMBRE · CRT-83 · 60 HZ</div>
+    </div>
+    {over && (
+      <div className="modal-bd"><div className="modal">
+        {/* FIN DEL JUEGO: score final, input nombre (máx 10 chars uppercase), guardar, replay, volver */}
+      </div></div>
+    )}
+  </div>
+)
+```
+
+Guardar score en Client Component:
+```ts
+const supabase = createClient()  // de lib/supabase/client.ts
+await supabase.from('scores').insert({ game_id, player_name, score, level })
+```
+
+## Juegos Implementados
+
+| id | título | color | ruta de juego |
+|----|--------|-------|---------------|
+| `asteroids` | ASTEROIDS | cyan | `/juegos/asteroids/jugar` |
+| `tetris` | TETRIS | blue | `/juegos/tetris/jugar` |
+| `arkanoid` | ARKANOID | magenta | `/juegos/arkanoid/jugar` |
+| `snake` | SNAKE | green | `/juegos/snake/jugar` |
+
+Cada juego nuevo requiere:
+1. `INSERT INTO games (...)` en Supabase
+2. Asset en `public/games/<id>/`
+3. `components/games/<Id>Canvas.tsx`
+4. `app/juegos/<id>/jugar/page.tsx`
+5. Ampliar `games.slice(0, N)` en `app/_home-client.tsx` si el total supera el límite del rail
 
 ## Next.js 16 Breaking Changes (vs. your training data)
 
@@ -27,7 +209,6 @@ Usa siempre /frontend-design para diseñar la interfaz de usuario.
 `params`, `searchParams`, `cookies()`, `headers()`, `draftMode()` are all async now. Synchronous access was removed.
 
 ```tsx
-// Page component
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 }
