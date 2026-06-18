@@ -1,6 +1,6 @@
 # 09 — Juego SNAKE y su integración en la plataforma
 
-**Estado:** aprobado
+**Estado:** implementado
 **Fecha:** 2026-06-18
 **Dependencias:** `06-leaderboard-games-table` (tablas `games` y `scores` operativas en Supabase,
 patrón AsteroidsCanvas establecido)

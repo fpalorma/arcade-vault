@@ -103,6 +103,7 @@ const SnakeCanvas = forwardRef<SnakeHandle, Props>(function SnakeCanvas(
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const rafRef = useRef<number | null>(null)
 
+  const pausedRef = useRef(paused)
   const emittedScore = useRef(-1)
   const emittedLives = useRef(-1)
   const emittedLevel = useRef(-1)
@@ -117,6 +118,7 @@ const SnakeCanvas = forwardRef<SnakeHandle, Props>(function SnakeCanvas(
   useEffect(() => { onLivesRef.current = onLives }, [onLives])
   useEffect(() => { onLevelRef.current = onLevel }, [onLevel])
   useEffect(() => { onGameOverRef.current = onGameOver }, [onGameOver])
+  useEffect(() => { pausedRef.current = paused }, [paused])
 
   function emit() {
     const g = gameRef.current
@@ -139,6 +141,7 @@ const SnakeCanvas = forwardRef<SnakeHandle, Props>(function SnakeCanvas(
   }
 
   function stepGame() {
+    if (pausedRef.current) return
     const g = gameRef.current
     if (g.state !== 'playing') return
 
@@ -283,23 +286,12 @@ const SnakeCanvas = forwardRef<SnakeHandle, Props>(function SnakeCanvas(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Pause / resume
-  useEffect(() => {
-    if (gameRef.current.state !== 'playing') return
-    if (paused) {
-      stopTick()
-    } else {
-      startTick(gameRef.current.level)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paused])
-
   return (
     <canvas
       ref={canvasRef}
       width={W}
       height={H}
-      style={{ display: 'block', imageRendering: 'pixelated' }}
+      style={{ display: 'block', position: 'absolute', inset: 0, width: '100%', height: '100%', imageRendering: 'pixelated' }}
     />
   )
 })
