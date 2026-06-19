@@ -21,6 +21,7 @@ Arcade Vault is an online gaming platform where users play and compete for high 
 ## Agentes
 
 - `game-planner` — Decide qué juego encaja con la plataforma. Investiga el catálogo, evita repetir lo ya sugerido y registra cada propuesta en `references/game-suggestions-todo.md`. **No implementa** — la implementación es trabajo de `/add-game`. Flujo: `game-planner propone → humano elige → /add-game <slug> implementa`.
+- `game-jam` — Recibe un juego recomendado y produce al menos dos specs completos (Variante A y Variante B) en `specs/game-jam-specs/<slug>/`, siguiendo la estructura de los specs validados. **No implementa** — la implementación es trabajo de `/add-game`. Flujo: `game-jam especifica variantes → humano elige → /add-game <slug> implementa`.
 
 ## Architecture
 
