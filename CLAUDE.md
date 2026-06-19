@@ -16,6 +16,11 @@ Arcade Vault is an online gaming platform where users play and compete for high 
 - `/verify` — Verificar que un cambio funciona ejecutando la app en el navegador.
 - `/code-review` — Revisar el diff actual en busca de bugs y mejoras.
 - `/run` — Arrancar la app y observar el comportamiento en el navegador.
+- `/add-game [slug]` — Añadir un juego completo a la plataforma (spec + implementación). Ver `.claude/skills/add-game/SKILL.md`.
+
+## Agentes
+
+- `game-planner` — Decide qué juego encaja con la plataforma. Investiga el catálogo, evita repetir lo ya sugerido y registra cada propuesta en `references/game-suggestions-todo.md`. **No implementa** — la implementación es trabajo de `/add-game`. Flujo: `game-planner propone → humano elige → /add-game <slug> implementa`.
 
 ## Architecture
 
