@@ -6,6 +6,8 @@ import { useUser } from '@/app/providers'
 import { storeUser } from '@/lib/user'
 import { createClient } from '@/lib/supabase/client'
 import ArkanoidCanvas, { type ArkanoidHandle } from '@/components/games/ArkanoidCanvas'
+import MobileGamepad from '@/components/ui/MobileGamepad'
+import { useIsMobile } from '@/lib/hooks/useIsMobile'
 
 export default function ArkanoidPlayerPage() {
   const { user } = useUser()
@@ -19,6 +21,7 @@ export default function ArkanoidPlayerPage() {
   const [saved,      setSaved]      = useState(false)
 
   const canvasRef = useRef<ArkanoidHandle>(null)
+  const isMobile = useIsMobile()
 
   function restart() {
     setScore(0)
@@ -66,7 +69,7 @@ export default function ArkanoidPlayerPage() {
           </div>
         </div>
         <div className="hud-actions">
-          <button className="btn yellow" onClick={() => setPaused(p => !p)}>
+          <button className="btn yellow btn-pause-hud" onClick={() => setPaused(p => !p)}>
             {paused ? 'REANUDAR' : 'PAUSA'}
           </button>
           <Link href="/juegos/arkanoid" className="btn ghost">SALIR</Link>
@@ -99,6 +102,14 @@ export default function ArkanoidPlayerPage() {
           <span>ARKANOID · CRT-83 · 60 HZ</span>
           <span>CARGA · 1MB</span>
         </div>
+      </div>
+
+      <div className="mobile-gamepad-area">
+        <MobileGamepad
+          visible={isMobile}
+          config={{ dpad: { up: false, left: true, right: true, down: false }, actions: [{ label: 'FIRE', key: ' ' }] }}
+          onPause={() => setPaused(p => !p)}
+        />
       </div>
 
       {over && (
