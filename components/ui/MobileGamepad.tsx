@@ -24,8 +24,17 @@ interface MobileGamepadProps {
   visible: boolean
 }
 
+const KEY_TO_CODE: Record<string, string> = {
+  ArrowUp: 'ArrowUp',
+  ArrowDown: 'ArrowDown',
+  ArrowLeft: 'ArrowLeft',
+  ArrowRight: 'ArrowRight',
+  ' ': 'Space',
+}
+
 function fireKey(key: string, type: 'keydown' | 'keyup') {
-  window.dispatchEvent(new KeyboardEvent(type, { key, bubbles: true, cancelable: true }))
+  const code = KEY_TO_CODE[key] ?? key
+  window.dispatchEvent(new KeyboardEvent(type, { key, code, bubbles: true, cancelable: true }))
 }
 
 function DPadButton({ label, dkey, enabled }: { label: string; dkey: DPadKey; enabled?: boolean }) {

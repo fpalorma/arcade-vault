@@ -73,7 +73,7 @@ export default function SnakePlayerPage() {
         </div>
       </div>
 
-      <div className="crt" style={{ maxWidth: 'min(480px, calc(100dvh - 282px))', margin: '0 auto' }}>
+      <div className="crt crt-snake">
         <div className="crt-screen" style={{ aspectRatio: '1 / 1' }}>
           <SnakeCanvas
             ref={canvasRef}

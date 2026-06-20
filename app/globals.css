@@ -45,7 +45,10 @@
 html, body, #root {
   height: 100%;
   margin: 0;
+  max-width: 100%;
 }
+
+html { overflow-x: hidden; }
 
 body {
   background: var(--bg);
@@ -147,6 +150,8 @@ a { color: inherit; text-decoration: none; }
   background: linear-gradient(180deg, rgba(10,10,15,0.92), rgba(10,10,15,0.78));
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
+  max-width: 100%;
+  overflow: hidden;
 }
 .av-nav .logo {
   display: flex; align-items: center; gap: 10px;
@@ -190,9 +195,10 @@ a { color: inherit; text-decoration: none; }
 .av-nav .hamburger { display: none; }
 
 @media (max-width: 840px) {
-  .av-nav { padding: 12px 16px; }
+  .av-nav { padding: 12px 16px; gap: 12px; }
   .av-nav .links { display: none; }
   .av-nav .coin-counter { display: none; }
+  .av-nav .auth-btn { display: none; }
   .av-nav .hamburger { display: inline-flex; }
 }
 
@@ -1552,11 +1558,12 @@ a { color: inherit; text-decoration: none; }
 
 /* ===== MOBILE GAMEPAD AREA ===== */
 .mobile-gamepad-area {
-  height: 180px;
+  height: 148px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 8px;
+  padding: 0 4px;
+  flex-shrink: 0;
 }
 
 /* ===== RESPONSIVE PLAYER (≤ 768px) ===== */
@@ -1564,35 +1571,49 @@ a { color: inherit; text-decoration: none; }
   .av-player {
     display: flex;
     flex-direction: column;
-    padding: 0 8px 8px;
-    margin: 8px auto;
-    gap: 8px;
+    padding: 0 6px;
+    margin: 0 auto;
+    gap: 4px;
+    max-height: calc(100dvh - 52px);
+    overflow: hidden;
   }
 
   .player-hud {
     flex-wrap: nowrap;
-    padding: 8px 10px;
-    gap: 8px;
+    padding: 6px 8px;
+    gap: 6px;
     margin-bottom: 0;
     overflow: hidden;
+    flex-shrink: 0;
   }
 
-  .hud-stat .l { font-size: 8px; }
-  .hud-stat .v { font-size: 12px; }
+  /* Fuerza la fila de stats a no envolver aunque tenga flexWrap inline */
+  .player-hud > div:first-child {
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+    overflow: hidden;
+    min-width: 0;
+  }
 
-  .hud-actions { gap: 6px; }
-  .hud-actions .btn { padding: 8px 10px; font-size: 8px; }
+  .hud-stat { min-width: 0; }
+  .hud-stat .l { font-size: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hud-stat .v { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .hud-actions { gap: 6px; flex-shrink: 0; }
+  .hud-actions .btn { padding: 6px 10px; font-size: 8px; white-space: nowrap; }
 
   .btn-pause-hud { display: none; }
 
   .crt {
     width: 100%;
-    padding: 10px;
-    border-radius: 16px;
+    padding: 6px;
+    border-radius: 12px;
     box-shadow:
-      0 0 0 4px #1b1b22,
-      0 0 0 5px #2a2a35,
-      0 16px 40px -10px rgba(0,245,255,0.25);
+      0 0 0 3px #1b1b22,
+      0 0 0 4px #2a2a35,
+      0 10px 30px -8px rgba(0,245,255,0.2);
+    flex-shrink: 1;
+    min-height: 0;
   }
 
   .crt-screen canvas {
@@ -1600,5 +1621,25 @@ a { color: inherit; text-decoration: none; }
     height: auto !important;
   }
 
-  .crt-bottom { font-size: 6px; margin-top: 8px; }
+  .crt-bottom { font-size: 6px; margin-top: 4px; }
+}
+
+/* Gamepad buttons más compactos en móvil */
+@media (max-width: 768px) {
+  .dpad-btn, .dpad-empty, .dpad-center-pip { width: 40px; height: 40px; }
+  .pause-btn { width: 42px; height: 42px; }
+  .action-btn { width: 46px; height: 46px; }
+}
+
+/* ===== CRT SIZING PER GAME ===== */
+/* 292px mobile = nav(52) + hud(46) + gaps(12) + gamepad(148) + crt-padding(12) + crt-bottom(22) */
+/* 282px desktop = original formula constant */
+.crt-tetris  { max-width: min(468px, calc((100dvh - 282px) * 0.7  + 48px)); margin: 0 auto; }
+.crt-arkanoid { max-width: min(528px, calc((100dvh - 282px) * 0.75 + 48px)); margin: 0 auto; }
+.crt-snake   { max-width: min(480px, calc(100dvh - 282px));                  margin: 0 auto; }
+
+@media (max-width: 768px) {
+  .crt-tetris  { max-width: calc((100dvh - 300px) * 0.7  + 12px); }
+  .crt-arkanoid { max-width: calc((100dvh - 300px) * 0.75 + 12px); }
+  .crt-snake   { max-width: min(100%, calc(100dvh - 294px)); }
 }
