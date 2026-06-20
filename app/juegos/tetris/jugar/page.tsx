@@ -6,6 +6,8 @@ import { useUser } from '@/app/providers'
 import { storeUser } from '@/lib/user'
 import { createClient } from '@/lib/supabase/client'
 import TetrisCanvas, { type TetrisHandle } from '@/components/games/TetrisCanvas'
+import MobileGamepad from '@/components/ui/MobileGamepad'
+import { useIsMobile } from '@/lib/hooks/useIsMobile'
 
 export default function TetrisPlayerPage() {
   const { user } = useUser()
@@ -19,6 +21,7 @@ export default function TetrisPlayerPage() {
   const [saved,      setSaved]      = useState(false)
 
   const canvasRef = useRef<TetrisHandle>(null)
+  const isMobile = useIsMobile()
 
   function restart() {
     setScore(0)
@@ -66,14 +69,14 @@ export default function TetrisPlayerPage() {
           </div>
         </div>
         <div className="hud-actions">
-          <button className="btn yellow" onClick={() => setPaused(p => !p)}>
+          <button className="btn yellow btn-pause-hud" onClick={() => setPaused(p => !p)}>
             {paused ? 'REANUDAR' : 'PAUSA'}
           </button>
           <Link href="/juegos/tetris" className="btn ghost">SALIR</Link>
         </div>
       </div>
 
-      <div className="crt" style={{ maxWidth: 'min(468px, calc((100dvh - 282px) * 7 / 10 + 48px))', margin: '0 auto' }}>
+      <div className="crt crt-tetris">
         <div className="crt-screen" style={{ aspectRatio: '7 / 10' }}>
           <TetrisCanvas
             ref={canvasRef}
@@ -99,6 +102,14 @@ export default function TetrisPlayerPage() {
           <span>TETRIS · CRT-83 · 60 HZ</span>
           <span>CARGA · 1MB</span>
         </div>
+      </div>
+
+      <div className="mobile-gamepad-area">
+        <MobileGamepad
+          visible={isMobile}
+          config={{ dpad: { up: false, left: true, right: true, down: true }, actions: [{ label: 'ROT', key: 'ArrowUp' }, { label: 'DROP', key: ' ' }] }}
+          onPause={() => setPaused(p => !p)}
+        />
       </div>
 
       {over && (

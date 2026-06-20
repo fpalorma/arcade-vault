@@ -112,9 +112,13 @@ components/
     ArkanoidCanvas.tsx
     TetrisCanvas.tsx
     SnakeCanvas.tsx
+  ui/
+    MobileGamepad.tsx — gamepad táctil retro (D-pad + acciones + pausa)
 
 lib/
   user.ts             — storeUser / getUser (localStorage)
+  hooks/
+    useIsMobile.ts    — detecta capacidad táctil via useSyncExternalStore (sin hidratación mismatch)
   supabase/
     server.ts
     client.ts
@@ -160,22 +164,26 @@ Cada `app/juegos/<id>/jugar/page.tsx` es un Client Component con este layout:
 'use client'
 // Estado React: score, lives/frutas, level, paused, over, playerName, saved
 // canvasRef: useRef<XxxHandle>(null)
+// isMobile: useIsMobile()  ← detecta touch via useSyncExternalStore
 
 return (
   <div className="av-player fade-in">
     <div className="player-hud">
       {/* stats: Jugador, Puntuación, Vidas/Frutas, Nivel */}
       <div className="hud-actions">
-        <button className="btn yellow">PAUSA / REANUDAR</button>
+        <button className="btn yellow btn-pause-hud">PAUSA / REANUDAR</button>  {/* oculto en móvil */}
         <Link href="/juegos/<id>" className="btn ghost">SALIR</Link>
       </div>
     </div>
-    <div className="crt">
+    <div className="crt [crt-tetris|crt-arkanoid|crt-snake]">  {/* clase de sizing para juegos tall */}
       <div className="crt-screen">
         <XxxCanvas ref={canvasRef} paused={paused} onScore={setScore} ... />
         {/* overlay de pausa opcional */}
       </div>
       <div className="crt-bottom">NOMBRE · CRT-83 · 60 HZ</div>
+    </div>
+    <div className="mobile-gamepad-area">
+      <MobileGamepad visible={isMobile} config={...} onPause={() => setPaused(p => !p)} />
     </div>
     {over && (
       <div className="modal-bd"><div className="modal">
@@ -185,6 +193,27 @@ return (
   </div>
 )
 ```
+
+### MobileGamepad — config por juego
+
+| juego | dpad | actions |
+|-------|------|---------|
+| Asteroids | `{ up: true, left: true, right: true, down: false }` | `[{ label: 'FIRE', key: ' ' }]` |
+| Tetris | `{ left: true, right: true, down: true, up: false }` | `[{ label: 'ROT', key: 'ArrowUp' }, { label: 'DROP', key: ' ' }]` |
+| Arkanoid | `{ left: true, right: true, up: false, down: false }` | `[{ label: 'FIRE', key: ' ' }]` |
+| Snake | `{ up: true, down: true, left: true, right: true }` | `[]` |
+
+Los botones del gamepad disparan `KeyboardEvent` sintéticos con `key` **y** `code` sobre `window` (necesario porque los canvas engines usan `e.code`).
+
+### CRT sizing classes (móvil)
+
+Los juegos con canvas tall (ratio > 1:1) usan clases CSS para limitar el ancho del CRT y evitar que el canvas desborde verticalmente en móvil:
+
+- `.crt-tetris` — ratio 7:10
+- `.crt-arkanoid` — ratio 3:4
+- `.crt-snake` — ratio 1:1
+
+Asteroids (ratio 4:3) no necesita clase; el ancho 100% produce una altura que cabe en el viewport.
 
 Guardar score en Client Component:
 ```ts
