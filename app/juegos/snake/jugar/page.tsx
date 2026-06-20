@@ -6,6 +6,8 @@ import { useUser } from '@/app/providers'
 import { storeUser } from '@/lib/user'
 import { createClient } from '@/lib/supabase/client'
 import SnakeCanvas, { type SnakeHandle } from '@/components/games/SnakeCanvas'
+import MobileGamepad from '@/components/ui/MobileGamepad'
+import { useIsMobile } from '@/lib/hooks/useIsMobile'
 
 export default function SnakePlayerPage() {
   const { user } = useUser()
@@ -19,6 +21,7 @@ export default function SnakePlayerPage() {
   const [saved,      setSaved]      = useState(false)
 
   const canvasRef = useRef<SnakeHandle>(null)
+  const isMobile = useIsMobile()
 
   function restart() {
     setScore(0)
@@ -66,7 +69,7 @@ export default function SnakePlayerPage() {
           </div>
         </div>
         <div className="hud-actions">
-          <button className="btn yellow" onClick={() => setPaused(p => !p)}>
+          <button className="btn yellow btn-pause-hud" onClick={() => setPaused(p => !p)}>
             {paused ? 'REANUDAR' : 'PAUSA'}
           </button>
           <Link href="/juegos/snake" className="btn ghost">SALIR</Link>
@@ -99,6 +102,14 @@ export default function SnakePlayerPage() {
           <span>SNAKE · CRT-83 · 60 HZ</span>
           <span>CARGA · 1MB</span>
         </div>
+      </div>
+
+      <div className="mobile-gamepad-area">
+        <MobileGamepad
+          visible={isMobile}
+          config={{ dpad: { up: true, down: true, left: true, right: true }, actions: [] }}
+          onPause={() => setPaused(p => !p)}
+        />
       </div>
 
       {over && (

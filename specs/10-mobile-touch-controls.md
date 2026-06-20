@@ -1,6 +1,6 @@
 # 10 — Controles táctiles y layout responsive para los 4 juegos
 
-**Estado:** Aprobado
+**Estado:** Implementado
 **Fecha:** 2026-06-19
 **Dependencias:** `05-asteroids`, `07-tetris-game`, `08-arkanoid-game`, `09-snake-game`
 
