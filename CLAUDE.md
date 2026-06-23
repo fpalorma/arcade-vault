@@ -17,6 +17,7 @@ Arcade Vault is an online gaming platform where users play and compete for high 
 - `/code-review` — Revisar el diff actual en busca de bugs y mejoras.
 - `/run` — Arrancar la app y observar el comportamiento en el navegador.
 - `/add-game [slug]` — Añadir un juego completo a la plataforma (spec + implementación). Ver `.claude/skills/add-game/SKILL.md`.
+- `/spec-impl-game [NN-spec-name]` — Igual que `/spec-impl` pero al terminar hace handoff automático al agente `mobile-porter` para añadir la capa móvil. Pipeline completo: valida "Approved" → crea rama → implementa paso a paso → porta a móvil.
 
 ## Agentes
 
@@ -202,6 +203,7 @@ return (
 | Tetris | `{ left: true, right: true, down: true, up: false }` | `[{ label: 'ROT', key: 'ArrowUp' }, { label: 'DROP', key: ' ' }]` |
 | Arkanoid | `{ left: true, right: true, up: false, down: false }` | `[{ label: 'FIRE', key: ' ' }]` |
 | Snake | `{ up: true, down: true, left: true, right: true }` | `[]` |
+| Frogger | `{ up: true, down: true, left: true, right: true }` | `[]` |
 
 Los botones del gamepad disparan `KeyboardEvent` sintéticos con `key` **y** `code` sobre `window` (necesario porque los canvas engines usan `e.code`).
 
@@ -212,6 +214,7 @@ Los juegos con canvas tall (ratio > 1:1) usan clases CSS para limitar el ancho d
 - `.crt-tetris` — ratio 7:10
 - `.crt-arkanoid` — ratio 3:4
 - `.crt-snake` — ratio 1:1
+- `.crt-frogger` — ratio 8:7 (wide)
 
 Asteroids (ratio 4:3) no necesita clase; el ancho 100% produce una altura que cabe en el viewport.
 
