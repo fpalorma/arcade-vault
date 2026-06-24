@@ -754,37 +754,10 @@ function drawFrog(ctx: CanvasRenderingContext2D, frog: Frog) {
 }
 
 function drawHUD(ctx: CanvasRenderingContext2D, s: {
-  score: number
-  level: number
-  lives: number
   roundTime: number
 }) {
   const maxTime = ROUND_TIME_BASE
   const timeRatio = Math.max(0, s.roundTime / maxTime)
-
-  // Score - top left
-  ctx.fillStyle = 'rgba(0,0,0,0.6)'
-  ctx.fillRect(0, 0, 160, 22)
-  ctx.fillStyle = '#fff'
-  ctx.font = 'bold 13px monospace'
-  ctx.textAlign = 'left'
-  ctx.fillText(`SCORE: ${s.score}`, 6, 15)
-
-  // Level - top center
-  ctx.fillStyle = 'rgba(0,0,0,0.6)'
-  ctx.fillRect(CANVAS_W / 2 - 50, 0, 100, 22)
-  ctx.fillStyle = '#ffd700'
-  ctx.textAlign = 'center'
-  ctx.fillText(`NIVEL ${s.level}`, CANVAS_W / 2, 15)
-
-  // Lives - top right (frog icons)
-  ctx.fillStyle = 'rgba(0,0,0,0.6)'
-  ctx.fillRect(CANVAS_W - 110, 0, 110, 22)
-  for (let i = 0; i < s.lives; i++) {
-    const lx = CANVAS_W - 20 - i * 22
-    ctx.fillStyle = '#00e64d'
-    ctx.beginPath(); ctx.ellipse(lx, 11, 7, 6, 0, 0, Math.PI * 2); ctx.fill()
-  }
 
   // Time bar - bottom of HUD area (just above the play field visual)
   const barW = CANVAS_W - 4
