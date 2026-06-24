@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useUser } from '@/app/providers'
 import { storeUser } from '@/lib/user'
 import { createClient } from '@/lib/supabase/client'
@@ -12,9 +12,13 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile'
 export default function AsteroidsPlayerPage() {
   const { user } = useUser()
 
-  const [score,      setScore]      = useState(0)
-  const [lives,      setLives]      = useState(3)
-  const [level,      setLevel]      = useState(1)
+  // Refs — actualizados por el canvas a 60 fps, sin provocar re-renders
+  const scoreRef = useRef(0)
+  const livesRef = useRef(3)
+  const levelRef = useRef(1)
+
+  // Estado de display — sincronizado desde los refs a ≈10 fps
+  const [displayStats, setDisplayStats] = useState({ score: 0, lives: 3, level: 1 })
   const [paused,     setPaused]     = useState(false)
   const [over,       setOver]       = useState(false)
   const [playerName, setPlayerName] = useState(user?.name ?? 'INVITADO')
@@ -23,10 +27,28 @@ export default function AsteroidsPlayerPage() {
   const canvasRef = useRef<AsteroidsHandle>(null)
   const isMobile = useIsMobile()
 
+  useEffect(() => {
+    let rafId: number
+    let lastSync = 0
+    function sync(now: number) {
+      rafId = requestAnimationFrame(sync)
+      if (now - lastSync < 100) return   // ≈10 fps
+      lastSync = now
+      setDisplayStats({
+        score: scoreRef.current,
+        lives: livesRef.current,
+        level: levelRef.current,
+      })
+    }
+    rafId = requestAnimationFrame(sync)
+    return () => cancelAnimationFrame(rafId)
+  }, [])
+
   function restart() {
-    setScore(0)
-    setLives(3)
-    setLevel(1)
+    scoreRef.current = 0
+    livesRef.current = 3
+    levelRef.current = 1
+    setDisplayStats({ score: 0, lives: 3, level: 1 })
     setPaused(false)
     setOver(false)
     setSaved(false)
@@ -41,8 +63,8 @@ export default function AsteroidsPlayerPage() {
     await supabase.from('scores').insert({
       game_id: 'asteroids',
       player_name: playerName.trim(),
-      score,
-      level,
+      score: scoreRef.current,
+      level: levelRef.current,
     })
     setSaved(true)
   }
@@ -57,15 +79,15 @@ export default function AsteroidsPlayerPage() {
           </div>
           <div className="hud-stat">
             <div className="l">Puntuación</div>
-            <div className="v">{score.toLocaleString('es-ES')}</div>
+            <div className="v">{displayStats.score.toLocaleString('es-ES')}</div>
           </div>
           <div className="hud-stat lives">
             <div className="l">Vidas</div>
-            <div className="v">{'♥ '.repeat(Math.max(0, lives)).trim() || '—'}</div>
+            <div className="v">{'♥ '.repeat(Math.max(0, displayStats.lives)).trim() || '—'}</div>
           </div>
           <div className="hud-stat level">
             <div className="l">Nivel</div>
-            <div className="v">{String(level).padStart(2, '0')}</div>
+            <div className="v">{String(displayStats.level).padStart(2, '0')}</div>
           </div>
         </div>
         <div className="hud-actions">
@@ -81,10 +103,17 @@ export default function AsteroidsPlayerPage() {
           <AsteroidsCanvas
             ref={canvasRef}
             paused={paused}
-            onScore={setScore}
-            onLives={setLives}
-            onLevel={setLevel}
-            onGameOver={() => setOver(true)}
+            onScore={(v) => { scoreRef.current = v }}
+            onLives={(v) => { livesRef.current = v }}
+            onLevel={(v) => { levelRef.current = v }}
+            onGameOver={() => {
+              setDisplayStats({
+                score: scoreRef.current,
+                lives: livesRef.current,
+                level: levelRef.current,
+              })
+              setOver(true)
+            }}
           />
           {paused && (
             <div className="crt-content" style={{ background: 'rgba(0,0,0,0.6)', zIndex: 5 }}>
@@ -117,7 +146,7 @@ export default function AsteroidsPlayerPage() {
           <div className="modal">
             <h2>FIN DEL JUEGO</h2>
             <div className="final-label">PUNTUACIÓN FINAL</div>
-            <div className="final">{score.toLocaleString('es-ES')}</div>
+            <div className="final">{displayStats.score.toLocaleString('es-ES')}</div>
             {!saved ? (
               <div className="input-row">
                 <input
