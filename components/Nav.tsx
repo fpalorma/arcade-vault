@@ -1,15 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useUser } from '@/app/providers'
-import { removeUser } from '@/lib/user'
 
 export function Nav() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
-  const { user, setUser } = useUser()
+  const router = useRouter()
+  const { user, signOut } = useUser()
 
   const isLib = pathname === '/biblioteca' || pathname.startsWith('/juegos')
   const isSalon = pathname === '/salon'
@@ -19,9 +19,9 @@ export function Nav() {
 
   const close = () => setOpen(false)
 
-  function signOut() {
-    removeUser()
-    setUser(null)
+  async function handleSignOut() {
+    await signOut()
+    router.push('/auth')
   }
 
   return (
@@ -49,11 +49,16 @@ export function Nav() {
         </div>
 
         {user ? (
-          <button className="btn ghost auth-btn" onClick={signOut}>
-            {user.name} ▾
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span className="mono" style={{ fontSize: 11, color: 'var(--neon-cyan)', letterSpacing: '0.1em' }}>
+              {user.name}
+            </span>
+            <button className="btn ghost auth-btn" onClick={handleSignOut}>
+              SALIR
+            </button>
+          </div>
         ) : (
-          <Link href="/auth" className="btn auth-btn">Iniciar Sesión</Link>
+          <Link href="/auth" className="btn auth-btn">ACCEDER</Link>
         )}
 
         <button
@@ -75,9 +80,13 @@ export function Nav() {
         <Link href="/leaderboard" className={isLeaderboard ? 'active' : ''} onClick={close}>LEADERBOARD</Link>
         <Link href="/salon" className={isSalon ? 'active' : ''} onClick={close}>Salón de la Fama</Link>
         <Link href="/about" className={isAbout ? 'active' : ''} onClick={close}>ACERCA DE</Link>
-        <Link href="/auth" className={isAuth ? 'active' : ''} onClick={close}>
-          {user ? 'Cuenta' : 'Iniciar Sesión'}
-        </Link>
+        {user ? (
+          <button className="btn ghost" style={{ textAlign: 'left' }} onClick={() => { close(); handleSignOut() }}>
+            SALIR ({user.name})
+          </button>
+        ) : (
+          <Link href="/auth" className={isAuth ? 'active' : ''} onClick={close}>ACCEDER</Link>
+        )}
         <div style={{ flex: 1 }} />
         <div className="pixel" style={{ fontSize: 9, color: 'var(--ink-faint)', letterSpacing: '0.16em' }}>
           CRÉDITOS · 03

@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { Game } from '@/lib/supabase/queries'
 import { useUser } from '@/app/providers'
-import { storeUser } from '@/lib/user'
 import { createClient } from '@/lib/supabase/client'
 
 export default function JugarClient({ game }: { game: Game }) {
@@ -37,13 +36,13 @@ export default function JugarClient({ game }: { game: Game }) {
 
   async function handleSaveScore() {
     if (!playerName.trim()) return
-    storeUser({ name: playerName })
     const supabase = createClient()
     await supabase.from('scores').insert({
       game_id: game.id,
       player_name: playerName.trim(),
       score,
       level,
+      user_id: user?.id ?? null,
     })
     setSaved(true)
   }

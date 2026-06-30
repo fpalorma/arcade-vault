@@ -2,29 +2,62 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useUser } from '@/app/providers'
-import { storeUser, removeUser } from '@/lib/user'
+import { createClient } from '@/lib/supabase/client'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-export default function AuthPage() {
+function AuthContent() {
   const router = useRouter()
-  const { setUser } = useUser()
+  const searchParams = useSearchParams()
+  const supabase = createClient()
 
   const [tab, setTab] = useState<'in' | 'up'>('in')
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
+  const [error, setError] = useState(searchParams.get('error') ?? '')
+  const [loading, setLoading] = useState(false)
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault()
-    const name = (username || 'PLAYER1').toUpperCase().slice(0, 10)
-    storeUser({ name })
-    setUser({ name })
-    router.push('/')
+    setError('')
+    setLoading(true)
+
+    if (tab === 'in') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
+      if (error) { setError(error.message); setLoading(false); return }
+      router.push('/')
+    } else {
+      const player_name = (username || 'PLAYER1').toUpperCase().slice(0, 10)
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: pass,
+        options: {
+          data: { player_name },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      if (error) { setError(error.message); setLoading(false); return }
+      // Anti-enumeración: Supabase devuelve 200 sin error cuando el email ya existe,
+      // pero el array identities queda vacío y no se envía correo.
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        setError('Ese correo ya está registrado. Inicia sesión.')
+        setLoading(false)
+        return
+      }
+      router.push(`/auth/verify?email=${encodeURIComponent(email)}`)
+    }
+  }
+
+  async function signInWithOAuth(provider: 'google' | 'github') {
+    setError('')
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    })
   }
 
   function playAsGuest() {
-    removeUser()
-    setUser(null)
     router.push('/')
   }
 
@@ -40,27 +73,32 @@ export default function AuthPage() {
         </div>
 
         <div className="auth-tabs">
-          <button className={tab === 'in' ? 'on' : ''} onClick={() => setTab('in')}>INICIAR SESIÓN</button>
-          <button className={tab === 'up' ? 'on' : ''} onClick={() => setTab('up')}>CREAR CUENTA</button>
+          <button className={tab === 'in' ? 'on' : ''} onClick={() => { setTab('in'); setError('') }}>INICIAR SESIÓN</button>
+          <button className={tab === 'up' ? 'on' : ''} onClick={() => { setTab('up'); setError('') }}>CREAR CUENTA</button>
         </div>
 
         <form onSubmit={submit}>
-          <div className="field">
-            <label>Usuario</label>
-            <input value={username} onChange={e => setUsername(e.target.value)} placeholder="px_kai" />
-          </div>
           {tab === 'up' && (
             <div className="field slide-in">
-              <label>Correo electrónico</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jugador@vault.gg" />
+              <label>Usuario</label>
+              <input value={username} onChange={e => setUsername(e.target.value)} placeholder="px_kai" maxLength={10} />
             </div>
           )}
           <div className="field">
-            <label>Contraseña</label>
-            <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" />
+            <label>Correo electrónico</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jugador@vault.gg" required />
           </div>
-          <button className="btn lg" type="submit" style={{ width: '100%', marginTop: 8 }}>
-            {tab === 'in' ? 'ENTRAR AL VAULT' : 'CREAR Y JUGAR'}
+          <div className="field">
+            <label>Contraseña</label>
+            <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" required />
+          </div>
+          {error && (
+            <div style={{ color: 'var(--neon-magenta)', fontSize: 12, letterSpacing: '0.06em', marginTop: 4 }}>
+              ⚠ {error}
+            </div>
+          )}
+          <button className="btn lg" type="submit" disabled={loading} style={{ width: '100%', marginTop: 8 }}>
+            {loading ? '...' : tab === 'in' ? 'ENTRAR AL VAULT' : 'CREAR Y JUGAR'}
           </button>
         </form>
 
@@ -70,8 +108,8 @@ export default function AuthPage() {
 
         <div className="auth-divider">O CONTINÚA CON</div>
         <div className="social">
-          <button className="btn ghost" type="button">◆  GOOGLE</button>
-          <button className="btn ghost" type="button">▣  GITHUB</button>
+          <button className="btn ghost" type="button" onClick={() => signInWithOAuth('google')}>◆  GOOGLE</button>
+          <button className="btn ghost" type="button" onClick={() => signInWithOAuth('github')}>▣  GITHUB</button>
         </div>
 
         <div style={{ marginTop: 18, textAlign: 'center', fontSize: 11, color: 'var(--ink-faint)', letterSpacing: '0.1em' }}>
@@ -79,5 +117,13 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense>
+      <AuthContent />
+    </Suspense>
   )
 }

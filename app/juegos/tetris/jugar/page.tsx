@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { useUser } from '@/app/providers'
-import { storeUser } from '@/lib/user'
 import { createClient } from '@/lib/supabase/client'
 import TetrisCanvas, { type TetrisHandle } from '@/components/games/TetrisCanvas'
 import MobileGamepad from '@/components/ui/MobileGamepad'
@@ -36,13 +35,13 @@ export default function TetrisPlayerPage() {
 
   async function saveScore() {
     if (!playerName.trim()) return
-    storeUser({ name: playerName })
     const supabase = createClient()
     await supabase.from('scores').insert({
       game_id: 'tetris',
       player_name: playerName.trim(),
       score,
       level,
+      user_id: user?.id ?? null,
     })
     setSaved(true)
   }
@@ -118,7 +117,11 @@ export default function TetrisPlayerPage() {
             <h2>FIN DEL JUEGO</h2>
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{score.toLocaleString('es-ES')}</div>
-            {!saved ? (
+            {!user ? (
+              <div style={{ color: 'var(--ink-mid)', fontSize: 12, letterSpacing: '0.08em', margin: '8px 0' }}>
+                <Link href="/auth" className="btn ghost" style={{ fontSize: 11 }}>INICIA SESIÓN PARA GUARDAR</Link>
+              </div>
+            ) : !saved ? (
               <div className="input-row">
                 <input
                   value={playerName}

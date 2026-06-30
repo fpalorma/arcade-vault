@@ -19,7 +19,13 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Redirigir usuarios autenticados fuera de /auth (solo la ruta exacta;
+  // /auth/callback y /auth/verify deben seguir siendo accesibles).
+  if (user && request.nextUrl.pathname === '/auth') {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
 
   return response
 }

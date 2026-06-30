@@ -69,6 +69,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=  # Supabase anon/publishable key
 | score | int | |
 | level | int | |
 | created_at | timestamptz | |
+| user_id | uuid FK → auth.users(id) nullable | NULL para invitados |
 
 ### Supabase helpers (`lib/supabase/`)
 
@@ -80,9 +81,29 @@ En Client Components usar directamente `createClient()` de `lib/supabase/client.
 
 ### Auth
 
-- `app/providers.tsx` expone `useUser()` → `{ user: { name: string } | null }`
-- `lib/user.ts` — `storeUser({ name })` persiste el nombre en localStorage
-- `app/auth/page.tsx` — página de login/registro
+`app/providers.tsx` expone `useUser()` → `{ user: AppUser | null, signOut: () => Promise<void> }` donde:
+
+```ts
+interface AppUser {
+  id: string    // auth.users.id (UUID)
+  name: string  // player_name: máx 10 chars, uppercase
+  email: string
+}
+```
+
+El contexto se alimenta de `supabase.auth.onAuthStateChange` — única fuente de verdad; no hay localStorage. `lib/user.ts` fue eliminado.
+
+- `app/auth/page.tsx` — login/registro con email+contraseña, Google y GitHub
+- `app/auth/callback/route.ts` — Route Handler GET: intercambia `token_hash`/`code` por sesión y redirige a `/`
+- `app/auth/verify/page.tsx` — pantalla estática "Revisa tu correo" mostrada tras el registro
+
+**Derivación del `name`:**
+- Email/contraseña: campo "Usuario" del formulario → `.toUpperCase().slice(0, 10)`
+- Google / GitHub: `full_name ?? login ?? email` → `.toUpperCase().slice(0, 10)`
+
+**Nav:** muestra nombre del jugador + botón SALIR cuando hay sesión; enlace ACCEDER cuando no la hay.
+
+**Invitados:** pueden jugar sin cuenta; `user = null`; el modal de game over no permite guardar score.
 
 ## File Structure
 
@@ -94,7 +115,7 @@ app/
   providers.tsx       — UserProvider (auth context)
   globals.css         — Tailwind + theme tokens + utility classes
   about/              — página "Sobre nosotros" + formulario de contacto (Server Action)
-  auth/               — login / registro
+  auth/               — login / registro / callback OAuth / verify
   biblioteca/         — catálogo completo de juegos
   leaderboard/        — tabla global de puntuaciones
   salon/              — salón de la fama
@@ -117,7 +138,6 @@ components/
     MobileGamepad.tsx — gamepad táctil retro (D-pad + acciones + pausa)
 
 lib/
-  user.ts             — storeUser / getUser (localStorage)
   hooks/
     useIsMobile.ts    — detecta capacidad táctil via useSyncExternalStore (sin hidratación mismatch)
   supabase/
@@ -220,8 +240,9 @@ Asteroids (ratio 4:3) no necesita clase; el ancho 100% produce una altura que ca
 
 Guardar score en Client Component:
 ```ts
+const { user } = useUser()
 const supabase = createClient()  // de lib/supabase/client.ts
-await supabase.from('scores').insert({ game_id, player_name, score, level })
+await supabase.from('scores').insert({ game_id, player_name, score, level, user_id: user?.id ?? null })
 ```
 
 ## Juegos Implementados
