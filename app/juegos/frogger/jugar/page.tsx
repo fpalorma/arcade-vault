@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import { useUser } from "@/app/providers";
-import { storeUser } from "@/lib/user";
 import { createClient } from "@/lib/supabase/client";
 import FroggerGame, {
   type FroggerHandle,
@@ -58,13 +57,13 @@ export default function FroggerPlayerPage() {
 
   async function saveScore() {
     if (!playerName.trim()) return;
-    storeUser({ name: playerName });
     const supabase = createClient();
     await supabase.from("scores").insert({
       game_id: "frogger",
       player_name: playerName.trim(),
       score: scoreRef.current,
       level: levelRef.current,
+      user_id: user?.id ?? null,
     });
     setSaved(true);
   }
@@ -171,7 +170,11 @@ export default function FroggerPlayerPage() {
             <h2>FIN DEL JUEGO</h2>
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{displayStats.score.toLocaleString("es-ES")}</div>
-            {!saved ? (
+            {!user ? (
+              <div style={{ color: 'var(--ink-mid)', fontSize: 12, letterSpacing: '0.08em', margin: '8px 0' }}>
+                <Link href="/auth" className="btn ghost" style={{ fontSize: 11 }}>INICIA SESIÓN PARA GUARDAR</Link>
+              </div>
+            ) : !saved ? (
               <div className="input-row">
                 <input
                   value={playerName}
