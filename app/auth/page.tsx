@@ -16,7 +16,10 @@ function AuthContent() {
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
   const [error, setError] = useState(searchParams.get('error') ?? '')
+  const [passwordError, setPasswordError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -28,6 +31,12 @@ function AuthContent() {
       if (error) { setError(error.message); setLoading(false); return }
       router.push('/')
     } else {
+      if (!PASSWORD_REGEX.test(pass)) {
+        setPasswordError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.')
+        setLoading(false)
+        return
+      }
+      setPasswordError('')
       const player_name = (username || 'PLAYER1').toUpperCase().slice(0, 10)
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -73,8 +82,8 @@ function AuthContent() {
         </div>
 
         <div className="auth-tabs">
-          <button className={tab === 'in' ? 'on' : ''} onClick={() => { setTab('in'); setError('') }}>INICIAR SESIÓN</button>
-          <button className={tab === 'up' ? 'on' : ''} onClick={() => { setTab('up'); setError('') }}>CREAR CUENTA</button>
+          <button className={tab === 'in' ? 'on' : ''} onClick={() => { setTab('in'); setError(''); setPasswordError('') }}>INICIAR SESIÓN</button>
+          <button className={tab === 'up' ? 'on' : ''} onClick={() => { setTab('up'); setError(''); setPasswordError('') }}>CREAR CUENTA</button>
         </div>
 
         <form onSubmit={submit}>
@@ -91,6 +100,11 @@ function AuthContent() {
           <div className="field">
             <label>Contraseña</label>
             <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" required />
+            {tab === 'up' && passwordError && (
+              <div style={{ color: 'var(--neon-magenta)', fontSize: 12, letterSpacing: '0.06em', marginTop: 4 }}>
+                ⚠ {passwordError}
+              </div>
+            )}
           </div>
           {error && (
             <div style={{ color: 'var(--neon-magenta)', fontSize: 12, letterSpacing: '0.06em', marginTop: 4 }}>

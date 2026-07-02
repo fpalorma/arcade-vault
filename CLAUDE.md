@@ -23,6 +23,7 @@ Arcade Vault is an online gaming platform where users play and compete for high 
 
 - `game-planner` — Decide qué juego encaja con la plataforma. Investiga el catálogo, evita repetir lo ya sugerido y registra cada propuesta en `references/game-suggestions-todo.md`. **No implementa** — la implementación es trabajo de `/add-game`. Flujo: `game-planner propone → humano elige → /add-game <slug> implementa`.
 - `game-jam` — Recibe un juego recomendado y produce al menos dos specs completos (Variante A y Variante B) en `specs/game-jam-specs/<slug>/`, siguiendo la estructura de los specs validados. **No implementa** — la implementación es trabajo de `/add-game`. Flujo: `game-jam especifica variantes → humano elige → /add-game <slug> implementa`.
+- `security-monitor` — Auditor read-only de seguridad. Corre el Security Advisor de Supabase, verifica RLS en `games`/`scores`, la ausencia de `rls_auto_enable()`, los security headers de Next.js y el `PASSWORD_REGEX` en `app/auth/page.tsx`. Registra cada auditoría en `references/security/audit-log.md` (append-only). **No modifica la base de datos ni el código de la app.** Referencia: `specs/13-security-hardening.md`.
 
 ## Architecture
 
@@ -146,7 +147,11 @@ lib/
     queries.ts
 
 specs/                — especificaciones de features (Spec Driven Design)
-references/           — assets fuente (sprites, referencias visuales)
+references/
+  security/
+    security-checklist  — checklist original de los 5 vectores de hardening
+    audit-log.md        — journal de auditorías del agente security-monitor (append-only)
+  game-suggestions-todo.md
 public/games/         — assets de juegos servidos en producción
 proxy.ts              — equivalente de middleware (Next.js 16)
 ```
