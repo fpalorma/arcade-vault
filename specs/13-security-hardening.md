@@ -1,6 +1,6 @@
 # 13 — Hardening de seguridad
 
-**Estado:** Aprobado
+**Estado:** Implementado
 **Fecha:** 2026-07-02
 **Dependencias:** `04-supabase-base`, `12-auth-supabase`
 
