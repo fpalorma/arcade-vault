@@ -242,8 +242,15 @@ function stepGame(
 
   if (b.x + b.w > p.x && b.x < p.x + p.w &&
       b.y + b.h > p.y && b.y + b.h < p.y + p.h + Math.abs(b.vy)) {
+    const hitPoint  = (b.x + b.w / 2) - (p.x + p.w / 2)   // distancia al centro del paddle
+    const hitFactor = Math.max(-1, Math.min(1, hitPoint / (p.w / 2)))  // normalizado [-1, 1]
+    const maxAngle  = Math.PI / 3   // 60°
+    const angle     = hitFactor * maxAngle
+    const speed     = Math.hypot(b.vx, b.vy)
+
     b.y  = p.y - b.h
-    b.vy = -Math.abs(b.vy)
+    b.vx = speed * Math.sin(angle)
+    b.vy = -speed * Math.cos(angle)
     playBounce()
   }
 
